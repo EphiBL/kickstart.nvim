@@ -109,6 +109,11 @@ vim.opt.mouse = 'a'
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
 
+-- vim.opt.winbar = "  %{expand('%:t')} %m"
+--
+-- Show full path in top bar of each window
+vim.opt.winbar = "%{expand('%:p')} %m"
+
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
@@ -336,6 +341,40 @@ require('lazy').setup({
           '--listen=127.0.0.1:43000',
         },
       })
+
+      -- CPP configuration
+      -- cpptools adapter
+      dap.adapters.cppdbg = {
+        id = 'cppdbg',
+        type = 'executable',
+        command = vim.fn.stdpath 'data' .. '/mason/packages/cpptools/extension/debugAdapters/bin/OpenDebugAD7',
+      }
+
+      -- Configure C++ debugging
+      dap.configurations.cpp = {
+        {
+          name = 'Launch file',
+          type = 'cppdbg',
+          request = 'launch',
+          program = function()
+            return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+          end,
+          cwd = '${workspaceFolder}',
+          stopAtEntry = true,
+          MIMode = 'gdb',
+          miDebuggerPath = '/usr/bin/gdb',
+          setupCommands = {
+            {
+              text = '-enable-pretty-printing',
+              description = 'enable pretty printing',
+              ignoreFailures = false,
+            },
+          },
+        },
+      }
+
+      -- Also for C
+      dap.configurations.c = dap.configurations.cpp
 
       -- Key mappings
       vim.keymap.set('n', '<leader>db', function()
@@ -924,7 +963,16 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local util = require 'lspconfig/util'
       local servers = {
-        -- clangd = {},
+        clangd = {
+          cmd = {
+            'clangd',
+            '--fallback-style=Google',
+            '--completion-style=detailed',
+            '--header-insertion=never',
+          },
+        },
+        marksman = {},
+
         gopls = {
           capabilities = capabilities,
           cmd = { 'gopls' },
@@ -983,6 +1031,7 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'clangd',
         'gopls',
         'golangci-lint',
         'delve',
@@ -1023,7 +1072,7 @@ require('lazy').setup({
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
+        local disable_filetypes = { c = true }
         return {
           timeout_ms = 500,
           lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
@@ -1032,6 +1081,8 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         go = { 'gofumpt', 'goimports' },
+        cmake = { 'cmake_format' },
+        cpp = { 'clang_format' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
@@ -1341,5 +1392,20 @@ vim.api.nvim_create_autocmd('FileType', {
     vim.bo.smartindent = true
   end,
 })
+-- C/C++-specific settings
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'c', 'cpp' },
+  callback = function()
+    -- C/C++ uses 2 spaces for indentation
+    vim.bo.tabstop = 2
+    vim.bo.shiftwidth = 2
+    vim.bo.expandtab = true -- Use spaces, not tabs
+    vim.bo.softtabstop = 2
+    -- Ensure auto-indent is enabled
+    vim.bo.autoindent = true
+    vim.bo.smartindent = true
+  end,
+})
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=3 sts=2 sw=2 et
