@@ -1,0 +1,265 @@
+{
+	"Main": {
+		"prefix": "main",
+		"body": [
+			"int main() {",
+			"\t$0",
+			"\treturn 0;",
+			"}"
+		],
+		"description": "Main"
+	},
+	"Main with Arguments": {
+		"prefix": "margs",
+		"body": [
+			"int main(int argc, char* argv[]) {",
+			"\t${0}",
+			"\treturn 0;",
+			"}"
+		],
+		"description": "Standard main function with command line arguments"
+	},
+	"Competitive Programming Template": {
+		"prefix": "comp",
+		"body": [
+			"#include <bits/stdc++.h>",
+			"",
+			"int main() {",
+			"\tstd::ios::sync_with_stdio(false);",
+			"\tstd::cin.tie(0);",
+			"",
+			"\tint t{};",
+			"\tstd::cin >> t;",
+			"",
+			"\twhile (t--) {",
+			"\t\t$0",
+			"\t}",
+			"}"
+		],
+		"description": "Description"
+	},
+	"Vector": {
+		"prefix": "v",
+		"body": [
+			"std::vector<${1}> ${2:name};"
+		],
+		"description": "Creates a vector"
+	},
+	"Unordered Map": {
+		"prefix": "um",
+		"body": [
+			"std::unordered_map<${1}, ${2}> ${3:name};"
+		],
+		"description": "Creates an unordered map"
+	},
+	"String": {
+		"prefix": "s",
+		"body": [
+			"std::string"
+		],
+		"description": "std::string type with trailing space"
+	},
+	"String View": {
+		"prefix": "sv",
+		"body": [
+			"std::string_view"
+		],
+		"description": "std::string_view type with trailing space"
+	},
+	"Static Cast": {
+		"prefix": "sc",
+		"body": [
+			"static_cast<${1:type}>(${2:expression})"
+		],
+		"description": "C++ static_cast conversion"
+	},
+	"Array": {
+		"prefix": "arr",
+		"body": [
+			"std::array<${1:type}, ${2:size}> ${3:name};"
+		],
+		"description": "Creates a std::array with specified size"
+	},
+	"For Loop": {
+		"prefix": "for",
+		"body": [
+			"for (${1:size_t} ${2:i} = ${3:0}; ${2:i} < ${4:n}; ++${2:i}) {",
+			"\t${5}",
+			"}"
+		],
+		"description": "Basic for loop"
+	},
+	"Input Stream": {
+		"prefix": "cin",
+		"body": [
+			"std::cin >> ${1};"
+		],
+		"description": "Standard input stream"
+	},
+	"Output Stream": {
+		"prefix": "cout",
+		"body": [
+			"std::cout << ${1};"
+		],
+		"description": "Standard output stream"
+	},
+	"Bitset": {
+		"prefix": "bs",
+		"body": [
+			"std::bitset<${1:size}> ${2:name};"
+		],
+		"description": "Creates a std::bitset"
+	},
+	"End Line": {
+		"prefix": "end",
+		"body": [
+			"std::endl;"
+		],
+		"description": "Standard end line"
+	},
+	"New Line": {
+		"prefix": "'",
+		"body": [
+			"'\\n' "
+		],
+		"description": "Description"
+	},
+	"Include": {
+		"prefix": "#",
+		"body": [
+			"#include "
+		],
+		"description": "Include directive"
+	},
+	"Pragma Once": {
+		"prefix": "prag",
+		"body": [
+			"#pragma once",
+			"$0"
+		],
+		"description": "Pragma once directive for header files"
+	},
+	"Constexpr": {
+		"prefix": "con",
+		"body": [
+			"constexpr "
+		],
+		"description": "Constexpr variable declaration"
+	},
+	"Include IOStream": {
+		"prefix": "stio",
+		"body": [
+			"#include <iostream>",
+			"$0"
+		],
+		"description": "Include the iostream header"
+	},
+	"Debug Print": {
+		"prefix": "dbg",
+		"body": [
+			"#ifdef DEBUG",
+			"std::cerr << \"${1:Debug:} \" << ${2:expression} << std::endl;",
+			"#endif"
+		],
+		"description": "Conditional debug print statement"
+	},
+	"Using Namespace": {
+		"prefix": "using",
+		"body": [
+			"using namespace ${1:std};"
+		],
+		"description": "Using namespace declaration"
+	},
+	"Namespace": {
+		"prefix": "ns",
+		"body": [
+			"namespace ${1:name} {",
+			"\t${0}",
+			"} // namespace $1"
+		],
+		"description": "Namespace block with end comment"
+	},
+	"Class Declaration": {
+		"prefix": "class",
+		"body": [
+			"class ${1:Name} {",
+			"public:",
+			"\t$1(${2:params}) : ${3:init_list} {}",
+			"\t~$1() = default;",
+			"",
+			"private:",
+			"\t${0}",
+			"};"
+		],
+		"description": "Basic class declaration with constructor"
+	},
+	"Smart Pointer (Unique)": {
+		"prefix": "upt",
+		"body": [
+			"std::unique_ptr<${1:Type}> ${2:name} = std::make_unique<$1>(${3:args});"
+		],
+		"description": "std::unique_ptr with make_unique"
+	},
+	"Smart Pointer (Shared)": {
+		"prefix": "spt",
+		"body": [
+			"std::shared_ptr<${1:Type}> ${2:name} = std::make_shared<$1>(${3:args});"
+		],
+		"description": "std::shared_ptr with make_shared"
+	},
+	"Range-based For Loop": {
+		"prefix": "forr",
+		"body": [
+			"for (${1:const }auto& ${2:item} : ${3:container}) {",
+			"\t${0}",
+			"}"
+		],
+		"description": "Range-based for loop"
+	},
+	"Try-Catch Block": {
+		"prefix": "try",
+		"body": [
+			"try {",
+			"\t${1}",
+			"} catch (${2:const std::exception&} ${3:e}) {",
+			"\t${4:std::cerr << $3.what() << std::endl;}",
+			"\t${0}",
+			"}"
+		],
+		"description": "Try-catch exception handling block"
+	},
+	"Template Function": {
+		"prefix": "tfunc",
+		"body": [
+			"template<typename ${1:T}>",
+			"${2:void} ${3:function_name}(${4:parameters}) {",
+			"\t${0}",
+			"}"
+		],
+		"description": "Template function definition"
+	},
+	"Lambda Expression": {
+		"prefix": "lam",
+		"body": [
+			"[${1:capture}](${2:params}) { ${3:body} }"
+		],
+		"description": "C++ lambda expression"
+	},
+	"Optional with Value": {
+		"prefix": "opt",
+		"body": [
+			"std::optional<${1:Type}> ${2:name}{${3:value}};"
+		],
+		"description": "std::optional initialized with a value"
+	},
+	"Prefix Sum": {
+		"prefix": "prefix",
+		"body": [
+			"std::vector<long long> ${1:Vec}(${1:Vec}.size() + 1, 0);",
+			"for (size_t i = 0; i < ${1:Vec}.size(); ++i) {",
+			"\t${1:Vec}[i + 1] = ${1:Vec}[i] + ${1:Vec}[i];",
+			"}"
+		],
+		"description": "Calculate the prefix sum of a vector"
+	}
+}

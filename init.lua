@@ -117,7 +117,7 @@ vim.opt.winbar = "%{expand('%:p')} %m"
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
-vim.opt.clipboard = 'unnamedplus'
+vim.opt.clipboard = ''
 
 -- Enable break indent
 vim.opt.breakindent = true
@@ -167,6 +167,9 @@ vim.opt.hlsearch = true
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 vim.keymap.set('i', '<A-i>', '<Esc>')
+
+vim.keymap.set('v', '<C-c>', '"+y', { noremap = true, silent = true })
+vim.keymap.set('n', '<C-c>', '"+yy', { noremap = true, silent = true })
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
@@ -243,25 +246,25 @@ require('lazy').setup({
   { 'christoomey/vim-tmux-navigator', opts = {} },
 
   -- Add Supermaven support
-  {
-    'supermaven-inc/supermaven-nvim',
-    config = function()
-      require('supermaven-nvim').setup {
-        keymaps = {
-          accept_suggestion = '<Tab>',
-          clear_suggestion = '<C-]>',
-          accept_word = '<C-j>',
-        },
-        -- color = {
-        --   suggestion_color = "#ffffff",
-        --   cterm = 244,
-        -- }
-        condition = function()
-          return false
-        end,
-      }
-    end,
-  },
+  -- {
+  --   'supermaven-inc/supermaven-nvim',
+  --   config = function()
+  --     require('supermaven-nvim').setup {
+  --       keymaps = {
+  --         accept_suggestion = '<Tab>',
+  --         clear_suggestion = '<C-]>',
+  --         accept_word = '<C-j>',
+  --       },
+  --       -- color = {
+  --       --   suggestion_color = "#ffffff",
+  --       --   cterm = 244,
+  --       -- }
+  --       condition = function()
+  --         return false
+  --       end,
+  --     }
+  --   end,
+  -- },
 
   -- Move for loc
   {
@@ -672,6 +675,7 @@ require('lazy').setup({
         }
       end
 
+      -- disabled due to conflict with conform <leader>f
       vim.keymap.set('n', '<leader>fb', buffer_searcher, {})
 
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
@@ -933,6 +937,18 @@ require('lazy').setup({
             })
           end
 
+          if client and client.server_capabilities.documentOnTypeFormattingProvider then
+            vim.api.nvim_set_option_value('formatexpr', 'v:lua.vim.lsp.formatexpr()', { buf = event.buf })
+
+            -- Optional: You can also set this to trigger on InsertLeave
+            vim.api.nvim_create_autocmd('InsertLeave', {
+              buffer = event.buf,
+              callback = function()
+                vim.lsp.buf.format { async = true }
+              end,
+            })
+          end
+
           -- The following autocommand is used to enable inlay hints in your
           -- code, if the language server you are using supports them
           --
@@ -969,6 +985,8 @@ require('lazy').setup({
             '--fallback-style=Google',
             '--completion-style=detailed',
             '--header-insertion=never',
+            '--enable-config',
+            '--format-style=Google',
           },
         },
         marksman = {},
@@ -1116,7 +1134,7 @@ require('lazy').setup({
           -- {
           --   'rafamadriz/friendly-snippets',
           --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
+          -- require('luasnip.loaders.from_vscode').lazy_load(),
           --   end,
           -- },
         },
@@ -1134,6 +1152,13 @@ require('lazy').setup({
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
       luasnip.config.setup {}
+
+      -- Load snippets
+      require('luasnip.loaders.from_vscode').lazy_load {
+        paths = { '~/.config/nvim/snippets' },
+      }
+
+      require('luasnip').filetype_extend('json', { 'javascript' })
 
       cmp.setup {
         snippet = {
@@ -1181,12 +1206,13 @@ require('lazy').setup({
           --
           -- <c-l> will move you to the right of each of the expansion locations.
           -- <c-h> is similar, except moving you backwards.
-          ['<C-l>'] = cmp.mapping(function()
+          -- ['<C-x>'] = cmp.mapping(function()
+          ['<Tab>'] = cmp.mapping(function()
             if luasnip.expand_or_locally_jumpable() then
               luasnip.expand_or_jump()
             end
           end, { 'i', 's' }),
-          ['<C-h>'] = cmp.mapping(function()
+          ['<C-l>'] = cmp.mapping(function()
             if luasnip.locally_jumpable(-1) then
               luasnip.jump(-1)
             end
@@ -1392,20 +1418,25 @@ vim.api.nvim_create_autocmd('FileType', {
     vim.bo.smartindent = true
   end,
 })
--- C/C++-specific settings
+-- -- C/C++-specific settings
+-- NOT WORKING WITH SWITCH STATEMENTS, REPLACED BY CONFORM/CLANG-FORMAT
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'c', 'cpp' },
   callback = function()
-    -- C/C++ uses 2 spaces for indentation
+    -- Google C++ style: 2 spaces for indentation
     vim.bo.tabstop = 2
     vim.bo.shiftwidth = 2
     vim.bo.expandtab = true -- Use spaces, not tabs
     vim.bo.softtabstop = 2
+
     -- Ensure auto-indent is enabled
     vim.bo.autoindent = true
     vim.bo.smartindent = true
+
+    -- Google style: no indent for namespaces
+    -- Google style: case labels at same level as switch
+    vim.opt.cinoptions = 'N0,l1,g0,:0,=s,w1'
   end,
 })
-
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=3 sts=2 sw=2 et
